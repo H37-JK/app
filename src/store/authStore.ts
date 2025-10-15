@@ -1,6 +1,7 @@
 import {Platform} from "react-native";
 import * as SecureStore from 'expo-secure-store';
 import {create} from 'zustand';
+import {apiClient} from "@/src/api/apiClient";
 
 
 interface User {
@@ -13,18 +14,23 @@ interface AuthState {
     user: User | null
     accessToken: string | null
     isLoggedIn: boolean
+    isLoading: boolean
 }
 
 interface AuthAction {
     login: (tokens: { accessToken: string, refreshToken: string }) => Promise<void>
     logout: () => Promise<void>
     verifyAuth: () => Promise<void>
+    setIsLoading: (isLoading: boolean) => void
 }
 
 const useAuthStore = create<AuthState & AuthAction>((set, get) => ({
     accessToken: null,
     user: null,
     isLoggedIn: false,
+    isLoading: true,
+
+    setIsLoading: (isLoading) => set({ isLoading }),
 
     login: async (tokens) => {
         await setStorageItemAsync('accessToken', tokens.accessToken)
@@ -40,15 +46,37 @@ const useAuthStore = create<AuthState & AuthAction>((set, get) => ({
     },
 
     verifyAuth: async () => {
-        const accessToken = await SecureStore.getItemAsync('accessToken')
-        if (accessToken) {
+        const accessToken = await getStorageItemAsync('accessToken')
+        if (!accessToken) {
             return
         }
 
-        set({ user, accessToken, isLoggedIn: true })
+        try {
+            const response = await apiClient.get<User>('/api/user/me')
+            const user = response.data
+
+            set ({ user, accessToken, isLoggedIn: true })
+        } catch (error) {
+            console.log('에러', error)
+            await get().logout()
+        }
     }
 }))
 
+export default useAuthStore
+
+export async function getStorageItemAsync(key: string): Promise<string | null> {
+    if (Platform.OS === 'web') {
+        try {
+            return localStorage.getItem(key)
+        } catch (e) {
+            console.error(e)
+            return null
+        }
+    } else {
+        return await SecureStore.getItemAsync(key)
+    }
+}
 
 export async function setStorageItemAsync(key: string, value: string | null = null) {
     if (Platform.OS === 'web') {

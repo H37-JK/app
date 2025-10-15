@@ -2,7 +2,7 @@ import {FlatList, Pressable} from 'react-native';
 import {Link} from 'expo-router';
 import {ThemedText} from "@/components/themed-text";
 import {ThemedView} from "@/components/themed-view";
-import useAppStore from "@/store/userStore";
+import useAppStore from "@/src/store/userStore";
 import { FontAwesome } from "@react-native-vector-icons/fontawesome";
 
 

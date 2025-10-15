@@ -3,8 +3,8 @@ import React from 'react';
 
 import {HapticTab} from '@/components/haptic-tab';
 import {IconSymbol} from '@/components/ui/icon-symbol';
-import {Colors} from '@/constants/theme';
-import {useColorScheme} from '@/hooks/use-color-scheme';
+import {Colors} from '@/src/constants/theme';
+import {useColorScheme} from '@/src/hooks/use-color-scheme';
 
 export default function TabLayout() {
     const colorScheme = useColorScheme();
@@ -38,22 +38,7 @@ export default function TabLayout() {
                     headerShown: false
                 }}
             />
-            <Tabs.Screen
-                name="like"
-                options={{
-                    title: 'like',
-                    tabBarIcon: ({color}) => <IconSymbol size={28} name="chevron.left.forwardslash.chevron.right" color={color}/>,
-                    headerShown: false
-                }}
-            />
-            <Tabs.Screen
-                name="chat"
-                options={{
-                    title: 'chat',
-                    tabBarIcon: ({color}) => <IconSymbol size={28} name="chevron.left.forwardslash.chevron.right" color={color}/>,
-                    headerShown: false
-                }}
-            />
+
         </Tabs>
     );
 }
